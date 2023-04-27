@@ -6,6 +6,7 @@ as edges into a provided networkx graph.
 import multiprocessing
 import networkx as nx
 from os import path, remove
+import os
 import shutil
 import numpy as np
 import math
@@ -72,7 +73,15 @@ def chunk_fasta_file(ids: List[str], seqs: List[str], n_chunks: int) -> int:
         chunk_ids = ids[i*chunk_size:(i+1)*chunk_size]
         chunk_seqs = seqs[i*chunk_size:(i+1)*chunk_size]
 
-        with open(f'graphpart_{i}.fasta.tmp', 'w') as f:
+        current_idx = 0
+        for file in os.listdir('.'):
+            if file.endswith('.fasta.tmp'):
+                file_idx = int(file.split('.')[0].strip('graphpart_'))
+                if current_idx < file_idx:
+                    current_idx = file_idx
+
+
+        with open(f'graphpart_{i+current_idx}.fasta.tmp', 'w') as f:
             for id, seq in zip(chunk_ids, chunk_seqs):
                 f.write(id+'\n')
                 f.write(seq+'\n')
